@@ -39,6 +39,10 @@ class TextDetector:
 
         scores = normalize(scores)  # 加上后，效果变差; 评估结果好像还是好一点 After adding, the effect is worse; the evaluation result seems to be better
         text_lines = self.text_proposal_connector.get_text_lines(text_proposals, scores, image_shape)
+         
+         '''
+            apply filter on text lines based on score
+         '''
         keep_indices = self.filter_boxes(text_lines)
         text_lines = text_lines[keep_indices]
         text_lines = filter_out_of_window(text_lines, window)
