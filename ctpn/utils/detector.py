@@ -37,13 +37,13 @@ class TextDetector:
         :return: text_lines; [ num,(y1,x1,y2,x2,score)]
         """
 
-        scores = normalize(scores)  # 加上后，效果变差; 评估结果好像还是好一点
+        scores = normalize(scores)  # 加上后，效果变差; 评估结果好像还是好一点 After adding, the effect is worse; the evaluation result seems to be better
         text_lines = self.text_proposal_connector.get_text_lines(text_proposals, scores, image_shape)
         keep_indices = self.filter_boxes(text_lines)
         text_lines = text_lines[keep_indices]
         text_lines = filter_out_of_window(text_lines, window)
 
-        # 文本行nms
+        # 文本行nms Text line nms
         if text_lines.shape[0] != 0:
             keep_indices = np_utils.quadrangle_nms(text_lines[:, :8], text_lines[:, 8],
                                                    self.config.TEXT_LINE_NMS_THRESH)
@@ -60,7 +60,7 @@ class TextDetector:
 
 def filter_out_of_window(text_lines, window):
     """
-    过滤窗口外的text_lines
+    过滤窗口外的 Filter outside the window  text_lines
     :param text_lines: [n,9]
     :param window: [y1,x1,y2,x2]
     :return:
