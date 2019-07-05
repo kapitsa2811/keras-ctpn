@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
    File Name：     detector
-   Description :   文本行检测器
+   Description :  text line detector
    Author :       mick.yi
    date：          2019/3/14
 """
