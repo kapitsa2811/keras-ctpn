@@ -62,6 +62,10 @@ class TextDetector:
                         (widths > (self.config.TEXT_PROPOSALS_WIDTH * self.config.MIN_NUM_PROPOSALS)))[0]
 
 
+'''
+   adjust the window size
+'''
+   
 def filter_out_of_window(text_lines, window):
     """
     过滤窗口外的 Filter outside the window  text_lines
