@@ -38,7 +38,7 @@ def get_call_back():
                                  save_weights_only=True,
                                  period=5)
 
-    # 验证误差没有提升
+    # 验证误差没有提升 Verification error is not improved
     lr_reducer = ReduceLROnPlateau(monitor='loss',
                                    factor=0.1,
                                    cooldown=0,
@@ -50,16 +50,16 @@ def get_call_back():
 
 def main(args):
     set_gpu_growth()
-    # 加载标注
+    # 加载标注 Load label
     annotation_files = file_utils.get_sub_files(config.IMAGE_GT_DIR)
     image_annotations = [reader.load_annotation(file,
                                                 config.IMAGE_DIR) for file in annotation_files]
-    # 过滤不存在的图像，ICDAR2017中部分图像找不到
+    # 过滤不存在的图像，ICDAR2017中部分图像找不到 Filtering images that do not exist, some images in ICDAR2017 could not be found
     image_annotations = [ann for ann in image_annotations if os.path.exists(ann['image_path'])]
-    # 加载模型
+    # 加载模型 Loading model
     m = models.ctpn_net(config, 'train')
     models.compile(m, config, loss_names=['ctpn_regress_loss', 'ctpn_class_loss', 'side_regress_loss'])
-    # 增加度量
+    # 增加度量 Increase metric
     output = models.get_layer(m, 'ctpn_target').output
     models.add_metrics(m, ['gt_num', 'pos_num', 'neg_num', 'gt_min_iou', 'gt_avg_iou'], output[-5:])
     if args.init_epochs > 0:
@@ -67,7 +67,7 @@ def main(args):
     else:
         m.load_weights(config.PRE_TRAINED_WEIGHT, by_name=True)
     m.summary()
-    # 生成器
+    # 生成器 Builder
     gen = generator(image_annotations[:-100],
                     config.IMAGES_PER_GPU,
                     config.IMAGE_SHAPE,
@@ -81,7 +81,7 @@ def main(args):
                         config.ANCHORS_WIDTH,
                         config.MAX_GT_INSTANCES)
 
-    # 训练
+    # 训练 training
     m.fit_generator(gen,
                     steps_per_epoch=len(image_annotations) // config.IMAGES_PER_GPU * 2,
                     epochs=args.epochs,
