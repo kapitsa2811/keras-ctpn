@@ -29,7 +29,7 @@ def apply_regress(deltas, side_deltas, anchors, use_side_refine=False):
     cx = (anchors[:, 3] + anchors[:, 1]) * 0.5
 
     deltas = tf.concat([deltas, side_deltas], axis=1)
-    # 回归系数
+    # 回归系数 Regression coefficients
     deltas *= tf.constant([0.1, 0.2, 0.1])
     dy, dh, dx = deltas[:, 0], deltas[:, 1], deltas[:, 2]
 
