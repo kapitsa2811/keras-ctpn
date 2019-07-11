@@ -33,17 +33,19 @@ def apply_regress(deltas, side_deltas, anchors, use_side_refine=False):
     deltas *= tf.constant([0.1, 0.2, 0.1])
     dy, dh, dx = deltas[:, 0], deltas[:, 1], deltas[:, 2]
 
-    # 中心坐标回归
+    # 中心坐标回归 Central coordinate regression
     cy += dy * h
-    # 侧边精调
+    # 侧边精调 Side fine adjustment
     cx += dx * w
-    # 高度和宽度回归
+    # 高度和宽度回归 Height and width regression
     h *= tf.exp(dh)
 
-    # 转为y1,x1,y2,x2
+    # 转为y1,x1,y2,x2 Change to y1,x1,y2,x2
+
     y1 = cy - h * 0.5
     y2 = cy + h * 0.5
-    x1 = tf.maximum(cx - w * 0.5, 0.)  # 限制在窗口内,修复后继节点找不到对应的前驱节点
+    x1 = tf.maximum(cx - w * 0.5, 0.)  # 限制在窗口内,修复后继节点找不到对应的前驱节点 
+      #Restricted in the window, repair the successor node can not find the corresponding predecessor node
     x2 = cx + w * 0.5
 
     if use_side_refine:
@@ -62,9 +64,12 @@ def nms(boxes, scores, class_logits, max_output_size, iou_threshold=0.5, score_t
         name=None):
     """
     非极大抑制
-    :param boxes: 形状为[num_boxes, 4]的二维浮点型Tensor.
-    :param scores: 形状为[num_boxes]的一维浮点型Tensor,表示与每个框(每行框)对应的单个分数.
-    :param class_logits: 形状为[num_boxes,num_classes] 原始的预测类别
+    :param boxes: 形状为[num_boxes, 4]的二维浮点型Tensor. Two-dimensional floating point Tensor of shape [num_boxes, 4].
+
+    :param scores: 形状为[num_boxes]的一维浮点型Tensor,表示与每个框(每行框)对应的单个分数. A one-dimensional floating-point Tensor of shape [num_boxes] representing a single score corresponding to each box (each row of boxes).
+
+    :param class_logits: 形状为[num_boxes,num_classes] 原始的预测类别 Shape is [num_boxes,num_classes] original forecast category
+
     :param max_output_size: 一个标量整数Tensor,表示通过非最大抑制选择的框的最大数量.
     :param iou_threshold: 浮点数,IOU 阈值
     :param score_threshold:  浮点数, 过滤低于阈值的边框
