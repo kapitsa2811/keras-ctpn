@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
    File Name：     text_proposals
-   Description :  文本提议框生成
+   Description :  文本提议框生成 Text proposal box generation
    Author :       mick.yi
    date：          2019/3/14
 """
@@ -13,17 +13,18 @@ from ..utils import tf_utils
 def apply_regress(deltas, side_deltas, anchors, use_side_refine=False):
     """
     应用回归目标到边框, 垂直中心点偏移和高度缩放
-    :param deltas: 回归目标[N,(dy,dh,)]
-    :param side_deltas: 回归目标[N,(dx)]
+    Apply regression target to border, vertical center point offset and height scale
+    :param deltas: 回归目标[N,(dy,dh,)] Regression goal [N, (dy, dh,)]
+    :param side_deltas: 回归目标[N,(dx)] Regression goal [N, (dx)]
     :param anchors: anchor boxes[N,(y1,x1,y2,x2)]
-    :param use_side_refine: 是否应用侧边回归
+    :param use_side_refine: 是否应用侧边回归 Whether to apply side regression
     :return:
     """
-    # 高度和宽度
+    # 高度和宽度 Height and width
     h = anchors[:, 2] - anchors[:, 0]
     w = anchors[:, 3] - anchors[:, 1]
 
-    # 中心点坐标
+    # 中心点坐标 Center point coordinates
     cy = (anchors[:, 2] + anchors[:, 0]) * 0.5
     cx = (anchors[:, 3] + anchors[:, 1]) * 0.5
 
