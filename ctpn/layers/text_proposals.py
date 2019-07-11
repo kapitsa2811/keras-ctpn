@@ -70,18 +70,18 @@ def nms(boxes, scores, class_logits, max_output_size, iou_threshold=0.5, score_t
 
     :param class_logits: 形状为[num_boxes,num_classes] 原始的预测类别 Shape is [num_boxes,num_classes] original forecast category
 
-    :param max_output_size: 一个标量整数Tensor,表示通过非最大抑制选择的框的最大数量.
-    :param iou_threshold: 浮点数,IOU 阈值
-    :param score_threshold:  浮点数, 过滤低于阈值的边框
+    :param max_output_size: 一个标量整数Tensor,表示通过非最大抑制选择的框的最大数量. A scalar integer Tensor representing the maximum number of boxes selected by non-maximum suppression.
+    :param iou_threshold: 浮点数,IOU 阈值 Floating point number, IOU threshold
+    :param score_threshold:  浮点数, 过滤低于阈值的边框 Floating point number, filtering the border below the threshold
     :param name:
-    :return: 检测边框、边框得分、边框类别
+    :return: 检测边框、边框得分、边框类别 Detect border, border score, border category
     """
     indices = tf.image.non_max_suppression(boxes, scores, max_output_size, iou_threshold, score_threshold,
-                                           name)  # 一维索引
+                                           name)  # 一维索引    dimensional index
     output_boxes = tf.gather(boxes, indices)  # (M,4)
-    class_scores = tf.expand_dims(tf.gather(scores, indices), axis=1)  # 扩展到二维(M,1)
+    class_scores = tf.expand_dims(tf.gather(scores, indices), axis=1)  # 扩展到二维(M,1)  Expand to 2D (M, 1)
     class_logits = tf.gather(class_logits, indices)
-    # padding到固定大小
+    # padding到固定大小    padding fixw=ed size
     return [tf_utils.pad_to_fixed_size(output_boxes, max_output_size),
             tf_utils.pad_to_fixed_size(class_scores, max_output_size),
             tf_utils.pad_to_fixed_size(class_logits, max_output_size)]
