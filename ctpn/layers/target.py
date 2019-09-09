@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
    File Name：     Target
-   Description :   分类和回归目标层
+   Description :   分类和回归目标层 Classification and regression target layer
    Author :       mick.yi
    date：          2019/3/13
 """
