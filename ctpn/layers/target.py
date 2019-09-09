@@ -77,7 +77,7 @@ def side_regress_target(anchors, gt_boxes):
     """
     侧边改善回归目标 Side improvement goal
     :param anchors: [N,(y1,x1,y2,x2)]
-    :param gt_boxes: anchor 对应的GT boxes[N,(y1,x1,y2,x2)]
+    :param gt_boxes: anchor 对应的GT corresponding GT  boxes[N,(y1,x1,y2,x2)]
     :return:
     """
     w = anchors[:, 3] - anchors[:, 1]  # 实际是固定长度16 Actually fixed length 16
