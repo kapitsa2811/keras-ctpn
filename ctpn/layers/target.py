@@ -48,7 +48,7 @@ def compute_iou(gt_boxes, anchors):
 
 def ctpn_regress_target(anchors, gt_boxes):
     """
-    计算回归目标
+    计算回归目标 Calculate the regression goal
     :param anchors: [N,(y1,x1,y2,x2)]
     :param gt_boxes: [N,(y1,x1,y2,x2)]
     :return: [N, (dy, dh, dx)]  dx 代表侧边改善的 Representing side improvement
@@ -92,18 +92,18 @@ def side_regress_target(anchors, gt_boxes):
 def ctpn_target_graph(gt_boxes, gt_cls, anchors, valid_anchors_indices, train_anchors_num=128, positive_ratios=0.5,
                       max_gt_num=50):
     """
-    处理单个图像的ctpn回归目标
-    a)正样本: 与gt IoU大于0.7的anchor,或者与GT IoU最大的那个anchor
-    b)需要保证所有的GT都有anchor对应
-    :param gt_boxes: gt边框坐标 [gt_num, (y1,x1,y2,x2,tag)], tag=0为padding
-    :param gt_cls: gt类别 [gt_num, 1+1], 最后一位为tag, tag=0为padding
+    处理单个图像的ctpn回归目标 Handling ctpn regression targets for a single image
+    a)正样本 (Positive sample:): 与 (and) gt IoU 大于 (more than the) 0.7 的 (of) anchor,或者与 (Or with) GT IoU 最大的那个 (The biggest one) anchor
+    b)需要保证所有的GT都有 (Need to ensure that all GTs have) anchor 对应 correspond
+    :param gt_boxes: gt 边框坐标 (Border coordinates) [gt_num, (y1,x1,y2,x2,tag)], tag=0 为 (for) padding
+    :param gt_cls: gt 类别 (category) [gt_num, 1+1], 最后一位为 (The last one is) tag, tag=0为padding
     :param anchors: [anchor_num, (y1,x1,y2,x2)]
     :param valid_anchors_indices:有效的anchors索引 [anchor_num]
     :param train_anchors_num
     :param positive_ratios
     :param max_gt_num
     :return:
-    deltas:[train_anchors_num, (dy,dh,dx,tag)],anchor边框回归目标,tag=1为正负样本,tag=0为padding
+    deltas:[train_anchors_num, (dy,dh,dx,tag)],anchor 边框回归目标 (Border return target),tag= 1 为正负样本 (Positive and negative samples),tag=0 为padding
     class_id:[train_anchors_num,(class_id,tag)]
     indices: [train_anchors_num,(anchors_index,tag)] tag=1为正样本,tag=0为padding,-1为负样本
     """
