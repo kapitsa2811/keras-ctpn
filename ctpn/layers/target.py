@@ -92,7 +92,7 @@ def side_regress_target(anchors, gt_boxes):
 def ctpn_target_graph(gt_boxes, gt_cls, anchors, valid_anchors_indices, train_anchors_num=128, positive_ratios=0.5,
                       max_gt_num=50):
     """
-    处理单个图像的ctpn回归目标 Handling ctpn regression targets for a single image
+    处理单个图像的 (Processing a single image) ctpn 回归目标 (Return target) Handling ctpn regression targets for a single image
     a)正样本 (Positive sample:): 与 (and) gt IoU 大于 (more than the) 0.7 的 (of) anchor,或者与 (Or with) GT IoU 最大的那个 (The biggest one) anchor
     b)需要保证所有的GT都有 (Need to ensure that all GTs have) anchor 对应 correspond
     :param gt_boxes: gt 边框坐标 (Border coordinates) [gt_num, (y1,x1,y2,x2,tag)], tag=0 为 (for) padding
@@ -105,76 +105,85 @@ def ctpn_target_graph(gt_boxes, gt_cls, anchors, valid_anchors_indices, train_an
     :return:
     deltas:[train_anchors_num, (dy,dh,dx,tag)],anchor 边框回归目标 (Border return target),tag= 1 为正负样本 (Positive and negative samples),tag=0 为padding
     class_id:[train_anchors_num,(class_id,tag)]
-    indices: [train_anchors_num,(anchors_index,tag)] tag=1为正样本,tag=0为padding,-1为负样本
+    indices: [train_anchors_num,(anchors_index,tag)] tag=1 为正样本 (Positive sample),tag=0 为 (for) padding,-1 为负样本 (Negative sample)
     """
-    # 获取真正的GT,去除标签位
+    # 获取真正的 (Get real) GT, 去除标签位 (Remove label bits)
     gt_boxes = tf_utils.remove_pad(gt_boxes)
     gt_cls = tf_utils.remove_pad(gt_cls)[:, 0]  # [N,1]转[N]
 
     gt_num = tf.shape(gt_cls)[0]  # gt 个数
 
-    # 计算IoU
+    # 计算 (Calculation) IoU
     iou = compute_iou(gt_boxes, anchors)
-    # 每个GT对应的IoU最大的anchor是正样本(一般有多个)
-    gt_iou_max = tf.reduce_max(iou, axis=1, keep_dims=True)  # 每个gt最大的iou [gt_num,1]
-    gt_iou_max_bool = tf.equal(iou, gt_iou_max)  # bool类型[gt_num,num_anchors];每个gt最大的iou(可能多个)
+    # 每个 (Each) GT 对应的 (corresponding) IoU 最大的 (biggest) anchor 是正样本(一般有多个) (s a positive sample (generally there are multiple))
+    gt_iou_max = tf.reduce_max(iou, axis=1, keep_dims=True)  # 每个 (Each) gt 最大的 (biggest) iou [gt_num,1]
+    gt_iou_max_bool = tf.equal(iou, gt_iou_max)  # bool 类型 (Types of) [gt_num,num_anchors]; 每个 (Each) gt 最大的 (biggest) iou (可能多个) (Maybe multiple)
 
-    # 每个anchors最大iou ，且iou>0.7的为正样本
-    anchors_iou_max = tf.reduce_max(iou, axis=0, keep_dims=True)  # 每个anchor最大的iou; [1,num_anchors]
+    # 每个 (Each) anchors 最大 (maximum) iou ，且 (And) iou >0.7 的为正样本 (Positive sample)
+    anchors_iou_max = tf.reduce_max(iou, axis=0, keep_dims=True)  # 每个 (Each) anchor 最大的 (biggest) iou; [1,num_anchors]
     anchors_iou_max = tf.where(tf.greater_equal(anchors_iou_max, 0.7),
                                anchors_iou_max,
                                tf.ones_like(anchors_iou_max))
     anchors_iou_max_bool = tf.equal(iou, anchors_iou_max)
 
-    # 合并两部分正样本索引
+    # 合并两部分正样本索引 Combine two partial positive sample indexes
+
     positive_bool_matrix = tf.logical_or(gt_iou_max_bool, anchors_iou_max_bool)
-    # 获取最小的iou,用于度量
+    # 获取最小的iou,用于度量 Get the smallest iou for metrics
+
     gt_match_min_iou = tf.reduce_min(tf.boolean_mask(iou, positive_bool_matrix), keep_dims=True)[0]  # 一维
     gt_match_mean_iou = tf.reduce_mean(tf.boolean_mask(iou, positive_bool_matrix), keep_dims=True)[0]
-    # 正样本索引
-    positive_indices = tf.where(positive_bool_matrix)  # 第一维gt索引号,第二维anchor索引号
+    # 正样本索引 Positive sample index
+
+    positive_indices = tf.where(positive_bool_matrix)  # 第一维gt索引号 First dimension gt index number, 第二维 Second dimension anchor 索引号 The index number
+
     # before_sample_positive_indices = positive_indices  # 采样之前的正样本索引
-    # 采样正样本
+    # 采样正样本 Sampling positive sample
+
     positive_num = tf.minimum(tf.shape(positive_indices)[0], int(train_anchors_num * positive_ratios))
     positive_indices = tf.random_shuffle(positive_indices)[:positive_num]
 
-    # 获取正样本和对应的GT
+    # 获取正样本和对应的 Get positive samples and corresponding GT
     positive_gt_indices = positive_indices[:, 0]
     positive_anchor_indices = positive_indices[:, 1]
     positive_anchors = tf.gather(anchors, positive_anchor_indices)
     positive_gt_boxes = tf.gather(gt_boxes, positive_gt_indices)
     positive_gt_cls = tf.gather(gt_cls, positive_gt_indices)
 
-    # 计算回归目标
+    # 计算回归目标 Calculate the regression goal
+
     deltas = ctpn_regress_target(positive_anchors, positive_gt_boxes)
 
-    # # 获取负样本 iou<0.5
+    # # 获取负样本 Get a negative sample iou<0.5
     negative_bool = tf.less(tf.reduce_max(iou, axis=0), 0.5)
     positive_bool = tf.reduce_any(positive_bool_matrix, axis=0)  # 正样本anchors [num_anchors]
     negative_bool = tf.logical_and(negative_bool, tf.logical_not(positive_bool))
+ 
+    # 采样负样本 Sampling negative samples
 
-    # 采样负样本
     negative_num = tf.minimum(int(train_anchors_num * (1. - positive_ratios)), train_anchors_num - positive_num)
     negative_indices = tf.random_shuffle(tf.where(negative_bool)[:, 0])[:negative_num]
 
     negative_gt_cls = tf.zeros([negative_num])  # 负样本类别id为0
     negative_deltas = tf.zeros([negative_num, 3])
 
-    # 合并正负样本
+    # 合并正负样本 Combine positive and negative samples
+
     deltas = tf.concat([deltas, negative_deltas], axis=0, name='ctpn_target_deltas')
     class_ids = tf.concat([positive_gt_cls, negative_gt_cls], axis=0, name='ctpn_target_class_ids')
     indices = tf.concat([positive_anchor_indices, negative_indices], axis=0,
                         name='ctpn_train_anchor_indices')
     indices = tf.gather(valid_anchors_indices, indices)  # 对应到有效的索引号
 
-    # 计算padding
+    # 计算 Calculation padding
     deltas, class_ids = tf_utils.pad_list_to_fixed_size([deltas, tf.expand_dims(class_ids, 1)],
                                                         train_anchors_num)
-    # 将负样本tag标志改为-1;方便后续处理;
+    # 将负样本tag标志改为 (Change the negative sample tag flag to)-1; 方便后续处理 Convenient for subsequent processing;
     indices = tf_utils.pad_to_fixed_size_with_negative(tf.expand_dims(indices, 1), train_anchors_num,
                                                        negative_num=negative_num, data_type=tf.int64)
 
-    return [deltas, class_ids, indices, tf.cast(  # 用作度量的必须是浮点类型
+    return [deltas, class_ids, indices, tf.cast(  # 用作度量的必须是浮点类型 Must be used as a measure for floating point types
+
         gt_num, dtype=tf.float32), tf.cast(
         positive_num, dtype=tf.float32), tf.cast(negative_num, dtype=tf.float32),
             gt_match_min_iou, gt_match_mean_iou]
@@ -192,8 +201,8 @@ class CtpnTarget(layers.Layer):
         """
 
         :param inputs:
-        inputs[0]: GT 边框坐标 [batch_size, MAX_GT_BOXs,(y1,x1,y2,x2,tag)] ,tag=0 为padding
-        inputs[1]: GT 类别 [batch_size, MAX_GT_BOXs,num_class+1] ;最后一位为tag, tag=0 为padding
+        inputs[0]: GT 边框坐标  (Border coordinates)[batch_size, MAX_GT_BOXs,(y1,x1,y2,x2,tag)] ,tag=0 为 (for) padding
+        inputs[1]: GT 类别 (category) [batch_size, MAX_GT_BOXs,num_class+1] ;最后一位为tag, tag=0 为padding
         inputs[2]: Anchors [batch_size, anchor_num,(y1,x1,y2,x2)]
         inputs[3]: val_anchors_indices [batch_size, anchor_num]
         :param kwargs:
