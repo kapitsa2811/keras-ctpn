@@ -183,7 +183,7 @@ def ctpn_target_graph(gt_boxes, gt_cls, anchors, valid_anchors_indices, train_an
                                                        negative_num=negative_num, data_type=tf.int64)
 
     return [deltas, class_ids, indices, tf.cast(  # 用作度量的必须是浮点类型 Must be used as a measure for floating point types
-
+    #must be used as a measure for floating point types
         gt_num, dtype=tf.float32), tf.cast(
         positive_num, dtype=tf.float32), tf.cast(negative_num, dtype=tf.float32),
             gt_match_min_iou, gt_match_mean_iou]
