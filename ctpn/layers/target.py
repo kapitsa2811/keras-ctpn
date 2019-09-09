@@ -75,15 +75,16 @@ def ctpn_regress_target(anchors, gt_boxes):
 
 def side_regress_target(anchors, gt_boxes):
     """
-    侧边改善回归目标
+    侧边改善回归目标 Side improvement goal
     :param anchors: [N,(y1,x1,y2,x2)]
     :param gt_boxes: anchor 对应的GT boxes[N,(y1,x1,y2,x2)]
     :return:
     """
-    w = anchors[:, 3] - anchors[:, 1]  # 实际是固定长度16
+    w = anchors[:, 3] - anchors[:, 1]  # 实际是固定长度16 Actually fixed length 16
     center_x = (anchors[:, 3] + anchors[:, 1]) * 0.5
     gt_center_x = (gt_boxes[:, 3] + gt_boxes[:, 1]) * 0.5
-    # 侧边框移动到gt的侧边，相当于中心点偏移的两倍;不是侧边的anchor 偏移为0;
+    # 侧边框移动到gt的侧边 Side border moves to the side of gt，相当于中心点偏移的两倍 Equivalent to twice the offset of the center point;
+      不是侧边的anchor 偏移为0 Not the side anchor offset is 0;
     dx = (gt_center_x - center_x) * 2 / w
     return dx
 
