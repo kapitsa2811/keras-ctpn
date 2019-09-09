@@ -11,6 +11,10 @@ import tensorflow as tf
 from ..utils import tf_utils
 
 
+'''
+   ground truth and anchor boxes are taken and IOU calculated
+'''
+
 def compute_iou(gt_boxes, anchors):
     """
     计算iou
