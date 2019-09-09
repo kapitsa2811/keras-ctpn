@@ -24,7 +24,7 @@ def compute_iou(gt_boxes, anchors):
     """
     gt_boxes = tf.expand_dims(gt_boxes, axis=1)  # [N,1,4]
     anchors = tf.expand_dims(anchors, axis=0)  # [1,M,4]
-    # 交集
+    # 交集 Intersection
     intersect_w = tf.maximum(0.0,
                              tf.minimum(gt_boxes[:, :, 3], anchors[:, :, 3]) -
                              tf.maximum(gt_boxes[:, :, 1], anchors[:, :, 1]))
@@ -33,15 +33,15 @@ def compute_iou(gt_boxes, anchors):
                              tf.maximum(gt_boxes[:, :, 0], anchors[:, :, 0]))
     intersect = intersect_h * intersect_w
 
-    # 计算面积
+    # 计算面积 Calculated area
     area_gt = (gt_boxes[:, :, 3] - gt_boxes[:, :, 1]) * \
               (gt_boxes[:, :, 2] - gt_boxes[:, :, 0])
     area_anchor = (anchors[:, :, 3] - anchors[:, :, 1]) * \
                   (anchors[:, :, 2] - anchors[:, :, 0])
 
-    # 计算并集
+    # 计算并集 Computational union
     union = area_gt + area_anchor - intersect
-    # 交并比
+    # 交并比 Cross ratio
     iou = tf.divide(intersect, union, name='regress_target_iou')
     return iou
 
