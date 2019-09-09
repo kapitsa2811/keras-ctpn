@@ -51,22 +51,22 @@ def ctpn_regress_target(anchors, gt_boxes):
     计算回归目标
     :param anchors: [N,(y1,x1,y2,x2)]
     :param gt_boxes: [N,(y1,x1,y2,x2)]
-    :return: [N, (dy, dh, dx)]  dx 代表侧边改善的
+    :return: [N, (dy, dh, dx)]  dx 代表侧边改善的 Representing side improvement
     """
-    # anchor高度
+    # anchor高度 height
     h = anchors[:, 2] - anchors[:, 0]
-    # gt高度
+    # gt高度 height
     gt_h = gt_boxes[:, 2] - gt_boxes[:, 0]
 
-    # anchor中心点y坐标
+    # anchor中心点y坐标 Center point y coordinate
     center_y = (anchors[:, 2] + anchors[:, 0]) * 0.5
-    # gt中心点y坐标
+    # gt中心点y坐标 Center point y coordinate
     gt_center_y = (gt_boxes[:, 2] + gt_boxes[:, 0]) * 0.5
 
-    # 计算回归目标
+    # 计算回归目标 Calculate the regression goal
     dy = (gt_center_y - center_y) / h
     dh = tf.log(gt_h / h)
-    dx = side_regress_target(anchors, gt_boxes)  # 侧边改善
+    dx = side_regress_target(anchors, gt_boxes)  # 侧边改善 Side improvement
     target = tf.stack([dy, dh, dx], axis=1)
     target /= tf.constant([0.1, 0.2, 0.1])
 
