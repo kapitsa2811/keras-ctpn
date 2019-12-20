@@ -2,6 +2,7 @@
 """
    File Name：     anchor
    Description :  ctpn anchor层，在输入图像边框外的anchors丢弃
+   # Layers, anchors outside the border of the input image are discarded
    Author :       mick.yi
    date：          2019/3/13
 """
