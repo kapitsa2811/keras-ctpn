@@ -36,7 +36,11 @@ def ctpn_net(config, stage='train'):
     base_features = resnet50(input_image)
     num_anchors = len(config.ANCHORS_HEIGHT)
     predict_class_logits, predict_deltas, predict_side_deltas = ctpn(base_features, num_anchors, 64, 256)
-
+    '''
+    predict_class_logits: (N,20250,2)
+    predict_deltas :(N,20250,1)
+    predict_side_deltas:(N,20250,2)
+    '''
     # anchors 生成 Generate
     anchors, valid_anchors_indices = CtpnAnchor(config.ANCHORS_HEIGHT, config.ANCHORS_WIDTH, config.NET_STRIDE,
                                                 name='gen_ctpn_anchors')(base_features)
