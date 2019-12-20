@@ -17,7 +17,7 @@ from ..utils import tf_utils
 
 def compute_iou(gt_boxes, anchors):
     """
-    计算iou
+    计算iou Calculate iou
     :param gt_boxes: [N,(y1,x1,y2,x2)]
     :param anchors: [M,(y1,x1,y2,x2)]
     :return: IoU [N,M]
@@ -58,7 +58,7 @@ def ctpn_regress_target(anchors, gt_boxes):
     # gt高度 height
     gt_h = gt_boxes[:, 2] - gt_boxes[:, 0]
 
-    # anchor中心点y坐标 Center point y coordinate
+    # anchor 中心点y坐标 Center point y coordinate
     center_y = (anchors[:, 2] + anchors[:, 0]) * 0.5
     # gt中心点y坐标 Center point y coordinate
     gt_center_y = (gt_boxes[:, 2] + gt_boxes[:, 0]) * 0.5
