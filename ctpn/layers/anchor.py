@@ -13,13 +13,29 @@ import numpy as np
 def generate_anchors(heights, width):
     """
     生成基准anchors
-    :param heights: 高度列表
-    :param width: 宽度，数值
+    :param heights: 高度列表 height list
+    :param width: 宽度，数值 width, value
     :return:
     """
     w = np.array([width] * len(heights))
     h = np.array(heights)
     return np.stack([-0.5 * h, -0.5 * w, 0.5 * h, 0.5 * w], axis=1)
+
+'''
+
+array([[  -5.5,   -8. ,    5.5,    8. ],
+       [  -8. ,   -8. ,    8. ,    8. ],
+       [ -11.5,   -8. ,   11.5,    8. ],
+       [ -16.5,   -8. ,   16.5,    8. ],
+       [ -24. ,   -8. ,   24. ,    8. ],
+       [ -34. ,   -8. ,   34. ,    8. ],
+       [ -48.5,   -8. ,   48.5,    8. ],
+       [ -69.5,   -8. ,   69.5,    8. ],
+       [ -99. ,   -8. ,   99. ,    8. ],
+       [-141.5,   -8. ,  141.5,    8. ]])
+
+'''
+
 
 
 def shift(shape, stride, base_anchors):
